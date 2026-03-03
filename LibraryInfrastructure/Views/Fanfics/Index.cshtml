@@ -1,0 +1,79 @@
+@model IEnumerable<LibraryDomain.Model.Fanfic>
+@using LibraryDomain.Model
+
+@{
+    ViewData["Title"] = "Твори";
+    var allTags = ViewData["AllTags"] as List<Tag> ?? new List<Tag>();
+    var selectedTagId = ViewData["SelectedTagId"] as int?;
+    var search = ViewData["Search"] as string;
+}
+
+<section class="works-header">
+    <h1>Твори</h1>
+    <p>Список фанфіків у стилі архіву творів.</p>
+</section>
+
+@if (TempData["FanficImportSuccess"] is string importSuccess)
+{
+    <p class="success-msg">@importSuccess</p>
+}
+
+<section class="actions-row mb-space">
+    <a asp-action="Export" class="btn-simple ghost">Експортувати в Excel</a>
+    @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Author") || User.IsInRole("Admin")))
+    {
+        <a asp-action="Import" class="btn-simple ghost">Імпорт з Excel</a>
+        <a asp-action="DownloadTemplate" class="btn-simple ghost">Завантажити шаблон</a>
+    }
+</section>
+
+<form method="get" asp-action="Index" class="search-row">
+    <input type="search" name="q" value="@search" placeholder="Пошук за назвою або описом" />
+    @if (selectedTagId.HasValue)
+    {
+        <input type="hidden" name="tagId" value="@selectedTagId" />
+    }
+    <button type="submit">Шукати</button>
+</form>
+
+@if (allTags.Any())
+{
+    <section class="tag-filter-block">
+        <span class="label">Фільтр за тегом:</span>
+        <a asp-action="Index" class="tag-badge @(selectedTagId == null ? "active" : string.Empty)">Усі</a>
+        @foreach (var tag in allTags)
+        {
+            <a asp-action="Index" asp-route-tagId="@tag.Id" asp-route-q="@search" class="tag-badge @(selectedTagId == tag.Id ? "active" : string.Empty)">@tag.Name</a>
+        }
+    </section>
+}
+
+@if (!Model.Any())
+{
+    <p class="empty-note">Твори не знайдено.</p>
+}
+else
+{
+    <section class="works-list">
+        @foreach (var work in Model)
+        {
+            <article class="work-card">
+                <h2>@work.Title</h2>
+                <p class="desc">@((work.Description ?? "Без опису").Length > 220 ? (work.Description ?? "")[..220] + "..." : (work.Description ?? "Без опису"))</p>
+                <p class="meta">Рейтинг: @(work.ContentRating?.Name ?? "Не вказано")</p>
+
+                @if (work.FanficTags.Any())
+                {
+                    <div class="tags-row">
+                        @foreach (var tag in work.FanficTags.Select(ft => ft.Tag))
+                        {
+                            <a asp-action="Index" asp-route-tagId="@tag.Id" class="tag-badge">@tag.Name</a>
+                        }
+                    </div>
+                }
+
+                <a asp-action="Details" asp-route-id="@work.Id" class="btn-simple">Читати</a>
+            </article>
+        }
+    </section>
+}

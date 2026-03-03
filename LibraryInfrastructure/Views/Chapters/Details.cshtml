@@ -1,0 +1,93 @@
+@model LibraryInfrastructure.Models.ChapterReadingViewModel
+
+@{
+    ViewData["Title"] = $"Розділ {Model.Chapter.ChapterNumber}";
+}
+
+<article class="reading-page">
+    <header class="reading-header">
+        <p><a asp-controller="Fanfics" asp-action="Details" asp-route-id="@Model.Chapter.FanficId">← До твору</a></p>
+        <h1>Розділ @Model.Chapter.ChapterNumber: @Model.Chapter.Title</h1>
+        @if (Model.CanManage)
+        {
+            <div class="actions-row">
+                <a asp-action="Edit" asp-route-id="@Model.Chapter.Id" class="btn-simple ghost">Редагувати розділ</a>
+                <a asp-action="Delete" asp-route-id="@Model.Chapter.Id" class="btn-simple danger">Видалити розділ</a>
+            </div>
+        }
+    </header>
+
+    <section class="reading-content">
+        @Model.Chapter.Content
+    </section>
+
+    <nav class="chapter-nav">
+        @if (Model.PreviousChapterId.HasValue)
+        {
+            <a asp-action="Details" asp-route-id="@Model.PreviousChapterId" class="btn-simple">Previous Chapter</a>
+        }
+        else
+        {
+            <span class="btn-disabled">Previous Chapter</span>
+        }
+
+        @if (Model.NextChapterId.HasValue)
+        {
+            <a asp-action="Details" asp-route-id="@Model.NextChapterId" class="btn-simple">Next Chapter</a>
+        }
+        else
+        {
+            <span class="btn-disabled">Next Chapter</span>
+        }
+    </nav>
+</article>
+
+<section class="comments-block reading-comments">
+    <h2>Коментарі</h2>
+
+    @if (TempData["CommentError"] is string commentError)
+    {
+        <p class="validation-msg">@commentError</p>
+    }
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <form asp-controller="Comments" asp-action="CreateForChapter" asp-route-chapterId="@Model.Chapter.Id" method="post" class="comment-form">
+            @Html.AntiForgeryToken()
+            <textarea name="text" rows="5" placeholder="Напишіть коментар..."></textarea>
+            <button type="submit" class="btn-simple">Надіслати</button>
+        </form>
+    }
+    else
+    {
+        <p class="empty-note">Щоб коментувати, увійдіть у свій акаунт.</p>
+    }
+
+    @if (!Model.Comments.Any())
+    {
+        <p class="empty-note">Коментарів поки немає.</p>
+    }
+    else
+    {
+        <div class="comments-list">
+            @foreach (var comment in Model.Comments)
+            {
+                <article class="comment-card">
+                    <p>@comment.Text</p>
+                    <p class="meta">@(comment.User?.Username ?? "Невідомий автор")</p>
+                    <time>@comment.CreatedAt.ToString("dd.MM.yyyy HH:mm")</time>
+                    @if (User.Identity?.IsAuthenticated == true &&
+                        (User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == comment.UserId.ToString()))
+                    {
+                        <form asp-controller="Comments" asp-action="DeleteMine" method="post" class="inline-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@comment.Id" />
+                            <input type="hidden" name="chapterId" value="@Model.Chapter.Id" />
+                            <button type="submit" class="comment-delete-btn">видалити</button>
+                        </form>
+                    }
+                </article>
+            }
+        </div>
+    }
+</section>

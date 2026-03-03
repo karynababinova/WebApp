@@ -1,0 +1,123 @@
+@model LibraryInfrastructure.Models.FanficDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Fanfic.Title;
+}
+
+<section class="work-details">
+    <h1>@Model.Fanfic.Title</h1>
+    <p class="meta">Автор: @Model.Fanfic.User?.Username</p>
+    <p class="meta">Рейтинг: @(Model.Fanfic.ContentRating?.Name ?? "Не вказано")</p>
+    <p class="full-description">@(string.IsNullOrWhiteSpace(Model.Fanfic.Description) ? "Опис відсутній." : Model.Fanfic.Description)</p>
+
+    @if (Model.Fanfic.FanficTags.Any())
+    {
+        <div class="tags-row">
+            @foreach (var tag in Model.Fanfic.FanficTags.Select(ft => ft.Tag))
+            {
+                <a asp-controller="Fanfics" asp-action="Index" asp-route-tagId="@tag.Id" class="tag-badge">@tag.Name</a>
+            }
+        </div>
+    }
+
+    <div class="actions-row">
+        @if (Model.FirstChapterId.HasValue)
+        {
+            <a asp-controller="Chapters" asp-action="Details" asp-route-id="@Model.FirstChapterId" class="btn-simple">Почати читати</a>
+        }
+        else
+        {
+            <span class="empty-note">У цьому творі ще немає розділів.</span>
+        }
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <form asp-action="ToggleLike" asp-route-id="@Model.Fanfic.Id" method="post" class="inline-form">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-simple ghost">@(Model.IsLikedByCurrentUser ? "Зняти лайк" : "Лайк") (@Model.LikesCount)</button>
+            </form>
+
+            <form asp-action="ToggleBookmark" asp-route-id="@Model.Fanfic.Id" method="post" class="inline-form">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-simple ghost">@(Model.IsBookmarkedByCurrentUser ? "Прибрати із закладок" : "У закладки") (@Model.BookmarksCount)</button>
+            </form>
+
+            @if (Model.CanManageChapters)
+            {
+                <a asp-controller="Chapters" asp-action="Create" asp-route-fanficId="@Model.Fanfic.Id" class="btn-simple ghost">Додати розділ</a>
+                <a asp-action="Edit" asp-route-id="@Model.Fanfic.Id" class="btn-simple ghost">Редагувати твір</a>
+            }
+        }
+    </div>
+</section>
+
+<section class="chapters-block">
+    <h2>Розділи</h2>
+
+    @if (!Model.Chapters.Any())
+    {
+        <p class="empty-note">Список розділів порожній.</p>
+    }
+    else
+    {
+        <ol class="chapter-list">
+            @foreach (var chapter in Model.Chapters)
+            {
+                <li>
+                    <a asp-controller="Chapters" asp-action="Details" asp-route-id="@chapter.Id">
+                        @chapter.Title
+                    </a>
+                </li>
+            }
+        </ol>
+    }
+</section>
+
+<section class="comments-block">
+    <h2>Коментарі до твору</h2>
+
+    @if (TempData["FanficCommentError"] is string fanficCommentError)
+    {
+        <p class="validation-msg">@fanficCommentError</p>
+    }
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <form asp-controller="Comments" asp-action="CreateForFanfic" asp-route-fanficId="@Model.Fanfic.Id" method="post" class="comment-form">
+            @Html.AntiForgeryToken()
+            <textarea name="text" rows="4" placeholder="Напишіть коментар до твору..."></textarea>
+            <button type="submit" class="btn-simple">Надіслати</button>
+        </form>
+    }
+    else
+    {
+        <p class="empty-note">Щоб залишити коментар, увійдіть у профіль.</p>
+    }
+
+    @if (!Model.Comments.Any())
+    {
+        <p class="empty-note">Поки що коментарів немає.</p>
+    }
+    else
+    {
+        <div class="comments-list">
+            @foreach (var comment in Model.Comments)
+            {
+                <article class="comment-card">
+                    <p>@comment.Text</p>
+                    <p class="meta">@comment.User?.Username • @comment.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
+                    @if (User.Identity?.IsAuthenticated == true &&
+                        (User.IsInRole("Admin") || User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == comment.UserId.ToString()))
+                    {
+                        <form asp-controller="Comments" asp-action="DeleteMine" method="post" class="inline-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@comment.Id" />
+                            <input type="hidden" name="fanficId" value="@Model.Fanfic.Id" />
+                            <button type="submit" class="comment-delete-btn">видалити</button>
+                        </form>
+                    }
+                </article>
+            }
+        </div>
+    }
+</section>

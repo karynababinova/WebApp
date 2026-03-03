@@ -1,0 +1,16 @@
+@model LibraryDomain.Model.Chapter
+
+@{
+    ViewData["Title"] = "Видалення розділу";
+}
+
+<section class="form-shell">
+    <h1>Видалити розділ</h1>
+    <p>Ви дійсно хочете видалити розділ <strong>@Model.ChapterNumber: @Model.Title</strong>?</p>
+
+    <form asp-action="Delete" method="post" class="actions-row">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn-simple danger">Видалити</button>
+        <a asp-controller="Fanfics" asp-action="Details" asp-route-id="@Model.FanficId" class="btn-simple ghost">Скасувати</a>
+    </form>
+</section>

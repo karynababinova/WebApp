@@ -1,0 +1,39 @@
+@model LibraryDomain.Model.Comment
+
+@{
+    ViewData["Title"] = "Create comment";
+}
+
+<div class="content-card">
+    <h1>Add comment</h1>
+
+    <form asp-action="Create" method="post" class="row g-3">
+        <input type="hidden" name="fanficId" value="@ViewData["FanficId"]" />
+        <input type="hidden" name="chapterId" value="@ViewData["ChapterId"]" />
+        <input type="hidden" name="parentCommentId" value="@ViewData["ParentCommentId"]" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="col-12">
+            <label asp-for="Text" class="form-label"></label>
+            <textarea asp-for="Text" name="text" class="form-control" rows="6"></textarea>
+            <span asp-validation-for="Text" class="text-danger"></span>
+        </div>
+
+        <div class="col-12 stack">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            @if (ViewData["FanficId"] != null)
+            {
+                <a asp-controller="Fanfics" asp-action="Details" asp-route-id="@ViewData["FanficId"]" class="btn btn-outline-secondary">Back</a>
+            }
+            else
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+            }
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

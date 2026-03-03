@@ -1,0 +1,42 @@
+@model LibraryInfrastructure.Models.WorkFormViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Редагувати твір";
+    var tags = ViewData["Tags"] as List<SelectListItem> ?? new List<SelectListItem>();
+}
+
+<section class="form-shell">
+    <h1>Редагувати твір</h1>
+
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="validation-msg"></div>
+
+        <label asp-for="Title"></label>
+        <input asp-for="Title" />
+        <span asp-validation-for="Title" class="validation-msg"></span>
+
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" rows="6"></textarea>
+        <span asp-validation-for="Description" class="validation-msg"></span>
+
+        <label asp-for="ContentRatingId"></label>
+        <select asp-for="ContentRatingId" asp-items="ViewBag.ContentRatingId">
+            <option value="">Не вказано</option>
+        </select>
+
+        <label asp-for="SelectedTagIds"></label>
+        <select asp-for="SelectedTagIds" asp-items="tags" multiple size="8"></select>
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="actions-row">
+            <button type="submit" class="btn-simple">Зберегти</button>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn-simple ghost">Назад</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
