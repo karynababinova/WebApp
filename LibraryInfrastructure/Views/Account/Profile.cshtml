@@ -1,0 +1,63 @@
+@model LibraryInfrastructure.Models.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Мій профіль";
+}
+
+<section class="form-shell auth-shell">
+    <h1>Мій профіль</h1>
+
+    @if (ViewData["Saved"] as bool? == true)
+    {
+        <p class="meta">Профіль оновлено.</p>
+    }
+
+    <form asp-action="Profile" method="post">
+        <div asp-validation-summary="ModelOnly" class="validation-msg"></div>
+
+        <label>Роль</label>
+        <input value="@Model.RoleDisplayName" readonly />
+
+        <label asp-for="Username"></label>
+        <input asp-for="Username" />
+        <span asp-validation-for="Username" class="validation-msg"></span>
+
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email" class="validation-msg"></span>
+
+        <label asp-for="Bio"></label>
+        <textarea asp-for="Bio" rows="5"></textarea>
+        <span asp-validation-for="Bio" class="validation-msg"></span>
+        <div class="actions-row">
+            <button type="submit" class="btn-simple">Зберегти профіль</button>
+        </div>
+    </form>
+</section>
+
+<section class="work-details">
+    <h2>Мої фанфіки</h2>
+
+    @if (!Model.MyWorks.Any())
+    {
+        <p class="empty-note">У вас ще немає опублікованих творів.</p>
+    }
+    else
+    {
+        <div class="works-list">
+            @foreach (var work in Model.MyWorks)
+            {
+                <article class="work-card">
+                    <h3>@work.Title</h3>
+                    <p class="meta">Рейтинг: @(work.ContentRating?.Name ?? "Не вказано")</p>
+                    <p class="meta">Оновлено: @work.UpdatedAt.ToString("dd.MM.yyyy HH:mm")</p>
+                    <a asp-controller="Fanfics" asp-action="Details" asp-route-id="@work.Id" class="btn-simple">Відкрити</a>
+                </article>
+            }
+        </div>
+    }
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

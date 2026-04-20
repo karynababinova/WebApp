@@ -1,0 +1,35 @@
+@model LibraryInfrastructure.Models.Auth.LoginViewModel
+
+@{
+    ViewData["Title"] = "Вхід";
+}
+
+<section class="form-shell auth-shell">
+    <h1>Вхід</h1>
+
+    <form asp-action="Login" method="post">
+        <input type="hidden" asp-for="ReturnUrl" />
+        <div asp-validation-summary="ModelOnly" class="validation-msg"></div>
+
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email" class="validation-msg"></span>
+
+        <label asp-for="Password"></label>
+        <input asp-for="Password" />
+        <span asp-validation-for="Password" class="validation-msg"></span>
+
+        <label class="checkbox-row">
+            <input asp-for="RememberMe" /> @Html.DisplayNameFor(m => m.RememberMe)
+        </label>
+
+        <div class="actions-row">
+            <button type="submit" class="btn-simple">Увійти</button>
+            <a asp-action="Register" class="btn-simple ghost">Створити акаунт</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

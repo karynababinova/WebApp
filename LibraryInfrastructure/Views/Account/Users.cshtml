@@ -1,0 +1,83 @@
+@model IReadOnlyList<LibraryDomain.Model.User>
+@using LibraryInfrastructure.Security
+
+@{
+    ViewData["Title"] = "Користувачі";
+}
+
+<section class="form-shell">
+    <h1>Користувачі системи</h1>
+    <p class="meta">Адміністратор може блокувати та розблоковувати акаунти.</p>
+
+    @if (TempData["UsersSuccess"] is string successMessage)
+    {
+        <p class="success-msg">@successMessage</p>
+    }
+
+    @if (TempData["UsersError"] is string errorMessage)
+    {
+        <p class="validation-msg">@errorMessage</p>
+    }
+
+    @if (!Model.Any())
+    {
+        <p class="empty-note">Користувачів не знайдено.</p>
+    }
+    else
+    {
+        <div class="users-table-wrap">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Користувач</th>
+                        <th>Email</th>
+                        <th>Роль</th>
+                        <th>Статус</th>
+                        <th>Створено</th>
+                        <th>Дія</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        var isCurrentAdmin = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value == user.Id.ToString();
+                        <tr>
+                            <td>@user.Id</td>
+                            <td>@user.Username</td>
+                            <td>@user.Email</td>
+                            <td>@AppRoles.ToDisplayName(user.Role)</td>
+                            <td>
+                                @if (user.IsBlocked)
+                                {
+                                    <span class="status-badge blocked">Заблокований</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge active">Активний</span>
+                                }
+                            </td>
+                            <td>@user.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                @if (isCurrentAdmin)
+                                {
+                                    <span class="empty-note">Поточний адмін</span>
+                                }
+                                else
+                                {
+                                    <form asp-action="ToggleBlock" method="post" class="inline-form">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@user.Id" />
+                                        <button type="submit" class="btn-simple @(user.IsBlocked ? "ghost" : "danger")">
+                                            @(user.IsBlocked ? "Розблокувати" : "Заблокувати")
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
