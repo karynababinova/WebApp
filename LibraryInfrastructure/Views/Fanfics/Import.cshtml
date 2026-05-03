@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Імпорт творів";
+}
+
+<section class="form-shell">
+    <h1>Імпорт творів з Excel</h1>
+    <p>Завантажте `.xlsx` файл зі структурою, яку використовує система для творів та розділів.</p>
+
+    <div class="import-help">
+        <p class="meta">Очікувані колонки у файлі:</p>
+        <ol>
+            <li>Назва твору</li>
+            <li>Опис</li>
+            <li>Рейтинг</li>
+            <li>Теги</li>
+            <li>Назва розділу</li>
+            <li>Номер розділу</li>
+            <li>Текст розділу</li>
+        </ol>
+        <p class="meta">Теги можна перелічувати через `;` або `,`. Якщо твір уже існує у поточного автора, система оновить його, збереже теги та додасть або оновить розділи.</p>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div asp-validation-summary="All" class="validation-msg"></div>
+    }
+
+    <form asp-action="Import" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <label for="fileExcel">Оберіть Excel-файл</label>
+        <input type="file" name="fileExcel" id="fileExcel" accept=".xlsx" />
+
+        <div class="actions-row">
+            <button type="submit" class="btn-simple">Імпортувати</button>
+            <a asp-action="DownloadTemplate" class="btn-simple ghost">Завантажити шаблон</a>
+            <a asp-action="Index" class="btn-simple ghost">Назад до творів</a>
+        </div>
+    </form>
+</section>

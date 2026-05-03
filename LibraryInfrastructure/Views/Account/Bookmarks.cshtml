@@ -1,0 +1,29 @@
+@model IEnumerable<LibraryDomain.Model.Bookmark>
+
+@{
+    ViewData["Title"] = "Мої закладки";
+}
+
+<section class="work-details">
+    <h1>Мої закладки</h1>
+    <p class="meta">Тут зберігаються ваші улюблені фанфіки (ваша особиста папка).</p>
+
+    @if (!Model.Any())
+    {
+        <p class="empty-note">Закладок ще немає.</p>
+    }
+    else
+    {
+        <div class="works-list">
+            @foreach (var item in Model)
+            {
+                <article class="work-card">
+                    <h2>@item.Fanfic.Title</h2>
+                    <p class="meta">Рейтинг: @(item.Fanfic.ContentRating?.Name ?? "Не вказано")</p>
+                    <p class="meta">Додано: @item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
+                    <a asp-controller="Fanfics" asp-action="Details" asp-route-id="@item.FanficId" class="btn-simple">Відкрити</a>
+                </article>
+            }
+        </div>
+    }
+</section>

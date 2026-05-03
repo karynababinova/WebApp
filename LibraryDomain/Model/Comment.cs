@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace LibraryDomain.Model;
 
@@ -13,6 +14,7 @@ public partial class Comment : Entity
 
     public int? ParentCommentId { get; set; }
 
+    [Required]
     public string Text { get; set; } = null!;
 
     public bool IsDeleted { get; set; }

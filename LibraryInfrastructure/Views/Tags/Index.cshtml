@@ -1,0 +1,24 @@
+@model IEnumerable<LibraryDomain.Model.Tag>
+
+@{
+    ViewData["Title"] = "Теги";
+}
+
+<section class="tags-page">
+    <h1>Теги</h1>
+    <p>Оберіть тег, щоб відфільтрувати твори.</p>
+
+    @if (!Model.Any())
+    {
+        <p class="empty-note">Тегів поки немає.</p>
+    }
+    else
+    {
+        <div class="tags-row">
+            @foreach (var tag in Model.OrderBy(t => t.Name))
+            {
+                <a asp-controller="Fanfics" asp-action="Index" asp-route-tagId="@tag.Id" class="tag-badge">@tag.Name</a>
+            }
+        </div>
+    }
+</section>

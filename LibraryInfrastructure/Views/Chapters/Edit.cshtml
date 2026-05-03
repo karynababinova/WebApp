@@ -1,0 +1,33 @@
+@model LibraryDomain.Model.Chapter
+
+@{
+    ViewData["Title"] = "Редагувати розділ";
+}
+
+<section class="form-shell">
+    <h1>Редагувати розділ</h1>
+    <p class="meta">Твір: <strong>@ViewData["FanficTitle"]</strong></p>
+
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="validation-msg"></div>
+
+        <label asp-for="Title"></label>
+        <input asp-for="Title" />
+        <span asp-validation-for="Title" class="validation-msg"></span>
+
+        <label asp-for="Content"></label>
+        <textarea asp-for="Content" rows="12"></textarea>
+        <span asp-validation-for="Content" class="validation-msg"></span>
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="actions-row">
+            <button type="submit" class="btn-simple">Зберегти</button>
+            <a asp-controller="Fanfics" asp-action="Details" asp-route-id="@Model.FanficId" class="btn-simple ghost">Назад</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

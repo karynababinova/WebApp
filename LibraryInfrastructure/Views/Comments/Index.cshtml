@@ -1,0 +1,31 @@
+@model IEnumerable<LibraryDomain.Model.Comment>
+
+@{
+    ViewData["Title"] = "Коментарі";
+}
+
+<h1>Коментарі</h1>
+
+@if (!Model.Any())
+{
+    <p class="empty-note">Коментарів поки немає.</p>
+}
+else
+{
+    <div class="comments-list">
+        @foreach (var item in Model)
+        {
+            <article class="comment-card">
+                <p>@item.Text</p>
+                <p class="meta">
+                    Твір: <a asp-controller="Fanfics" asp-action="Details" asp-route-id="@item.FanficId">@item.Fanfic?.Title</a>
+                    @if (item.ChapterId.HasValue)
+                    {
+                        <text> • <a asp-controller="Chapters" asp-action="Details" asp-route-id="@item.ChapterId">Розділ</a></text>
+                    }
+                </p>
+                <time>@item.CreatedAt.ToString("dd.MM.yyyy HH:mm")</time>
+            </article>
+        }
+    </div>
+}

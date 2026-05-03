@@ -1,0 +1,38 @@
+@model LibraryInfrastructure.Models.Auth.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Реєстрація";
+}
+
+<section class="form-shell auth-shell">
+    <h1>Реєстрація</h1>
+
+    <form asp-action="Register" method="post">
+        <div asp-validation-summary="ModelOnly" class="validation-msg"></div>
+
+        <label asp-for="Username"></label>
+        <input asp-for="Username" />
+        <span asp-validation-for="Username" class="validation-msg"></span>
+
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+        <span asp-validation-for="Email" class="validation-msg"></span>
+
+        <label asp-for="Password"></label>
+        <input asp-for="Password" />
+        <span asp-validation-for="Password" class="validation-msg"></span>
+
+        <label asp-for="ConfirmPassword"></label>
+        <input asp-for="ConfirmPassword" />
+        <span asp-validation-for="ConfirmPassword" class="validation-msg"></span>
+
+        <div class="actions-row">
+            <button type="submit" class="btn-simple">Зареєструватися</button>
+            <a asp-action="Login" class="btn-simple ghost">У мене вже є акаунт</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

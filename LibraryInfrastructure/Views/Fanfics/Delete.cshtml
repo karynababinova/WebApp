@@ -1,0 +1,21 @@
+@model LibraryDomain.Model.Fanfic
+
+@{
+    ViewData["Title"] = "Видалити твір";
+}
+
+<section class="form-shell">
+    <h1>Видалити твір</h1>
+    <p>Ви впевнені, що хочете видалити цей твір?</p>
+
+    <p><strong>@Model.Title</strong></p>
+    <p class="meta">Рейтинг: @(Model.ContentRating?.Name ?? "Не вказано")</p>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div class="actions-row">
+            <button type="submit" class="btn-simple danger">Видалити</button>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn-simple ghost">Скасувати</a>
+        </div>
+    </form>
+</section>

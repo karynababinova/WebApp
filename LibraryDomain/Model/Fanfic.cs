@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace LibraryDomain.Model;
 
@@ -8,6 +9,8 @@ public partial class Fanfic : Entity
 
     public int UserId { get; set; }
 
+    [Required]
+    [StringLength(255)]
     public string Title { get; set; } = null!;
 
     public string? Description { get; set; }

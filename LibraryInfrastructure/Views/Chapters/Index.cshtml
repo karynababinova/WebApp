@@ -1,0 +1,17 @@
+@model IEnumerable<LibraryDomain.Model.Chapter>
+
+@{
+    ViewData["Title"] = "Розділи";
+}
+
+<h1>Розділи</h1>
+<p class="empty-note">Читання найзручніше починати зі сторінки конкретного твору.</p>
+
+<ul class="chapter-list">
+@foreach (var chapter in Model)
+{
+    <li>
+        <a asp-action="Details" asp-route-id="@chapter.Id">@chapter.Fanfic?.Title — Розділ @chapter.ChapterNumber: @chapter.Title</a>
+    </li>
+}
+</ul>

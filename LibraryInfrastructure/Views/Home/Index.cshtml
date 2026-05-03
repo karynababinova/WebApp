@@ -1,8 +1,150 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model HomeDashboardViewModel
+@{
+    ViewData["Title"] = "Аналітика";
+
+    var ratingMax = Math.Max(Model.WorksByRating.DefaultIfEmpty().Max(x => x?.Value ?? 0), 1);
+    var tagMax = Math.Max(Model.TopTags.DefaultIfEmpty().Max(x => x?.Value ?? 0), 1);
+    var engagementMax = Math.Max(Model.WorkEngagement.DefaultIfEmpty().Max(x => x?.TotalEngagement ?? 0), 1);
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="analytics-page">
+    <div class="analytics-hero">
+        <div>
+            <h1>Аналітика архіву творів</h1>
+            <p class="meta">Сторінка для етапу 1.5: візуалізація даних предметної області у вигляді діаграм.</p>
+        </div>
+        <div class="actions-row">
+            <a class="btn-simple" asp-controller="Fanfics" asp-action="Index">Перейти до творів</a>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <article class="stat-card">
+            <span class="stat-label">Твори</span>
+            <strong>@Model.TotalWorks</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Розділи</span>
+            <strong>@Model.TotalChapters</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Коментарі</span>
+            <strong>@Model.TotalComments</strong>
+        </article>
+        <article class="stat-card">
+            <span class="stat-label">Теги</span>
+            <strong>@Model.TotalTags</strong>
+        </article>
+    </div>
+
+    <div class="analytics-grid">
+        <section class="chart-card">
+            <h2>Кількість творів за рейтингом</h2>
+            <p class="meta">Горизонтальна діаграма показує, які вікові рейтинги трапляються найчастіше.</p>
+
+            @if (Model.WorksByRating.Count == 0)
+            {
+                <p class="empty-note">Поки що немає даних для побудови діаграми.</p>
+            }
+            else
+            {
+                <div class="bar-chart">
+                    @foreach (var item in Model.WorksByRating)
+                    {
+                        var width = item.Value == 0 ? 6 : Math.Max(10, (int)Math.Round(item.Value * 100.0 / ratingMax));
+                        <div class="bar-row">
+                            <div class="bar-label">@item.Label</div>
+                            <div class="bar-track">
+                                <div class="bar-fill accent-one" style="width:@(width)%"></div>
+                            </div>
+                            <div class="bar-value">@item.Value</div>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+
+        <section class="chart-card">
+            <h2>Найпопулярніші теги</h2>
+            <p class="meta">Діаграма відображає, які теги найчастіше прив'язуються до творів.</p>
+
+            @if (Model.TopTags.Count == 0)
+            {
+                <p class="empty-note">Поки що немає даних для побудови діаграми.</p>
+            }
+            else
+            {
+                <div class="bar-chart">
+                    @foreach (var item in Model.TopTags)
+                    {
+                        var width = item.Value == 0 ? 6 : Math.Max(10, (int)Math.Round(item.Value * 100.0 / tagMax));
+                        <div class="bar-row">
+                            <div class="bar-label">@item.Label</div>
+                            <div class="bar-track">
+                                <div class="bar-fill accent-two" style="width:@(width)%"></div>
+                            </div>
+                            <div class="bar-value">@item.Value</div>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+
+    <section class="chart-card">
+        <h2>Активність навколо творів</h2>
+        <p class="meta">Порівняння творів за кількістю розділів, коментарів, лайків і закладок.</p>
+
+        @if (Model.WorkEngagement.Count == 0)
+        {
+            <p class="empty-note">Поки що немає даних для побудови діаграми.</p>
+        }
+        else
+        {
+            <div class="activity-chart">
+                @foreach (var item in Model.WorkEngagement)
+                {
+                    var height = item.TotalEngagement == 0 ? 12 : Math.Max(18, (int)Math.Round(item.TotalEngagement * 180.0 / engagementMax));
+                    <article class="activity-card">
+                        <div class="activity-visual" style="height:@(height)px"></div>
+                        <div class="activity-title">
+                            <a asp-controller="Fanfics" asp-action="Details" asp-route-id="@item.FanficId">@item.Title</a>
+                        </div>
+                        <div class="activity-meta">
+                            <span>Розділи: @item.ChaptersCount</span>
+                            <span>Коментарі: @item.CommentsCount</span>
+                            <span>Лайки: @item.LikesCount</span>
+                            <span>Закладки: @item.BookmarksCount</span>
+                            <strong>Разом: @item.TotalEngagement</strong>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </section>
+
+    <section class="chart-card">
+        <h2>Останні оновлені твори</h2>
+        <p class="meta">Цей блок доповнює діаграми й показує приклади самих об'єктів предметної області.</p>
+
+        @if (Model.RecentWorks.Count == 0)
+        {
+            <p class="empty-note">У каталозі ще немає творів.</p>
+        }
+        else
+        {
+            <div class="recent-works-grid">
+                @foreach (var work in Model.RecentWorks)
+                {
+                    <article class="recent-work-card">
+                        <h3>
+                            <a asp-controller="Fanfics" asp-action="Details" asp-route-id="@work.Id">@work.Title</a>
+                        </h3>
+                        <p class="meta">Рейтинг: @work.RatingName</p>
+                        <p class="desc">@(string.IsNullOrWhiteSpace(work.Description) ? "Опис ще не додано." : work.Description)</p>
+                    </article>
+                }
+            </div>
+        }
+    </section>
+</section>

@@ -1,0 +1,20 @@
+@model LibraryDomain.Model.Comment
+
+@{
+    ViewData["Title"] = "Деталі коментаря";
+}
+
+<section class="form-shell">
+    <h1>Деталі коментаря</h1>
+    <p>@Model.Text</p>
+    <p class="meta">Створено: @Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</p>
+
+    @if (Model.ChapterId.HasValue)
+    {
+        <a asp-controller="Chapters" asp-action="Details" asp-route-id="@Model.ChapterId" class="btn-simple">До розділу</a>
+    }
+    else
+    {
+        <a asp-controller="Fanfics" asp-action="Details" asp-route-id="@Model.FanficId" class="btn-simple">До твору</a>
+    }
+</section>

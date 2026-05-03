@@ -1,0 +1,22 @@
+@model LibraryDomain.Model.Comment
+
+@{
+    ViewData["Title"] = "Delete comment";
+}
+
+<div class="content-card">
+    <h1>Delete comment</h1>
+    <p>Comment will be hidden (soft delete).</p>
+
+    <blockquote class="blockquote">
+        <p>@Model.Text</p>
+    </blockquote>
+
+    <p class="meta">Author: @Model.User?.Username • @Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</p>
+
+    <form asp-action="Delete" method="post" class="stack">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-controller="Fanfics" asp-action="Details" asp-route-id="@Model.FanficId" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>
